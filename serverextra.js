@@ -298,24 +298,75 @@ app.post('/employees/:id/assign-role', (req, res) => {
  *       500:
  *         description: Failed to search employees
  */
+// Find employees by name
 app.get('/employees/search', (req, res) => {
-    const { name } = req.query;
-    console.log('Search Query:', name);
-  
-    db.all('SELECT * FROM employees WHERE name LIKE ?', [`%${name}%`], (err, rows) => {
+  const { name } = req.query;
+  console.log('Search Query:', name);
+
+  db.all('SELECT * FROM employees WHERE name LIKE ?', [`%${name}%`], (err, rows) => {
       if (err) {
-        console.error(err);  // Log the error for further investigation
-        return res.status(500).json({ error: 'Failed to search employees.' });
+          console.error(err);  // Log the error for further investigation
+          return res.status(500).json({ error: 'Failed to search employees by name.' });
       }
-  
+
       if (!rows || rows.length === 0) {
-        return res.status(404).json({ error: 'Employee not found.' });
+          return res.status(404).json({ error: 'No employees found with the given name.' });
       }
-  
+
       res.json(rows);
-    });
   });
-  
+});
+
+// Find employee by ID
+
+/**
+ * @swagger
+ * /employees/search:
+ *   get:
+ *     summary: Search employees by ID
+ *     parameters:
+ *       - in: query
+ *         ID: ID
+ *         description: The ID to search for
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: Employees retrieved successfully
+ *         schema:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               ID:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *       500:
+ *         description: Failed to search employees
+ */
+// Find employees by ID
+app.get('/employees/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.get('SELECT * FROM employees WHERE id = ?', [id], (err, row) => {
+      if (err) {
+          console.error(err);  // Log the error for further investigation
+          return res.status(500).json({ error: 'Failed to retrieve employee by ID.' });
+      }
+
+      if (!row) {
+          return res.status(404).json({ error: 'Employee not found.' });
+      }
+
+      res.json(row);
+  });
+});
+
 
 // 4. Admin Dashboard
 /**

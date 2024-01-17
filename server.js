@@ -288,17 +288,66 @@ app.post('/employees/:id/assign-role', (req, res) => {
  *       500:
  *         description: Failed to search employees
  */
+// Find employees by name
 app.get('/employees/search', (req, res) => {
-    const { name } = req.query;
-  
-    dataAccess.searchEmployeesByName(name, (err, rows) => {
+  const { name } = req.query;
+  console.log('Search Query:', name);
+
+  db.all('SELECT * FROM employees WHERE name LIKE ?', [`%${name}%`], (err, rows) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to search employees.' });
+          console.error(err);  // Log the error for further investigation
+          return res.status(500).json({ error: 'Failed to search employees by name.' });
       }
-  
+
+      if (!rows || rows.length === 0) {
+          return res.status(404).json({ error: 'No employees found with the given name.' });
+      }
+
       res.json(rows);
-    });
   });
+});
+
+// Find employee by ID
+/**
+ * @swagger
+ * /employees/{id}:
+ *   delete:
+ *     summary: Get employee by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: The ID of the employee to delete
+ *         required: true
+ *         type: integer
+ *     responses:
+ *       200:
+ *         description: Employee deleted successfully
+ *         schema:
+ *           type: object
+ *           properties:
+ *             message:
+ *               type: string
+ *       404:
+ *         description: Employee not found
+ *       500:
+ *         description: Failed to delete employee
+ */
+app.get('/employees/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.get('SELECT * FROM employees WHERE id = ?', [id], (err, row) => {
+      if (err) {
+          console.error(err);  // Log the error for further investigation
+          return res.status(500).json({ error: 'Failed to retrieve employee by ID.' });
+      }
+
+      if (!row) {
+          return res.status(404).json({ error: 'Employee not found.' });
+      }
+
+      res.json(row);
+  });
+});
 
 // 4. Admin Dashboard
 /**

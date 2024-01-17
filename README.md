@@ -1,6 +1,3 @@
-Certainly! Here's a GitHub documentation template for your Employee Management System project:
-
-```markdown
 # Employee Management System
 
 ## Introduction
@@ -30,13 +27,16 @@ Ensure the following are installed on your machine:
 
    ```bash
    git clone https://github.com/waley-code/employeeManagement.git
+   ```
+
 ```
 
 2. **Navigate to the Project Directory:**
 
    ```bash
    cd employee-management-system
-   ```
+```
+
 3. **Install Dependencies:**
 
    ```bash
